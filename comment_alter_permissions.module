@@ -1,0 +1,45 @@
+<?php
+/**
+ * Implements hook_permission().
+ */
+function comment_alter_permissions_permission() {
+  return array(
+    'comment alter own content' => array(
+      'title'       => t('Comment alter own content'),
+      'description' => t('Allows a user to alter fields via comments on their own content.'),
+    ),
+    'comment alter any content' => array(
+      'title'       => t('Comment alter any content'),
+      'description' => t('Allows a user to alter fields via comments on any content.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function comment_alter_permissions_form_alter(&$form, &$form_state, $form_id) {
+  if ('comment-form' == $form['#id']) {
+    global $user;
+    $is_author = $form['#node']->uid == $user->uid;
+
+    // If you aren't the author or aren't allowed to alter all content, then buh-bye.
+    if (!user_access('comment alter any content') && !($is_author && user_access('comment alter own content'))) {
+      // Retrieve the alterable fields for this content type
+      $alterable_fields = comment_alter_get_alterable_fields($form['#node']->type);
+
+      // Remove the alterable fields from the form.
+      foreach ($alterable_fields as $alterable_field) {
+        if (isset($form[$alterable_field])) {
+          unset($form[$alterable_field]); // Buh-bye
+        }
+        if (isset($form[$alterable_field . '_old'])) {
+          unset($form[$alterable_field . '_old']); // Buh-bye
+        }
+      }
+
+      // Remove the comment_alter value tracking alterable fields.
+      unset($form['comment_alter']); // Buh-bye
+    }
+  }
+}

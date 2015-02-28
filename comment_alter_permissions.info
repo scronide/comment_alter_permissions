@@ -1,0 +1,5 @@
+name           = Comment Alter Permissions
+description    = Provides additional permissions for the Comment Alter module.
+core           = 7.x
+dependencies[] = comment_alter
+version        = 7.x-1.0
