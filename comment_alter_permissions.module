@@ -1,5 +1,14 @@
 <?php
 /**
+ * Implements hook_comment_view().
+ */
+function comment_alter_permissions_comment_view($comment, $view_mode, $langcode) {
+  if (!isset($comment->comment_alter)) {
+    $comment->comment_alter = array('old_vid' => NULL, 'new_vid' => NULL);
+  }
+}
+
+/**
  * Implements hook_permission().
  */
 function comment_alter_permissions_permission() {
